@@ -3,7 +3,7 @@ const fs = require("fs");
 const configuredApiBase = String(process.env.API_BASE_URL || "").trim();
 const apiBase = (configuredApiBase && !configuredApiBase.includes("wimps-api.onrender.com"))
 	? configuredApiBase.replace(/\/$/, "")
-	: "https://back-end-eryo.onrender.com/api";
+	: "https://wimps-api.onrender.com/api";
 const contents = `window.APP_CONFIG = window.APP_CONFIG || {};
 window.APP_CONFIG.API_BASE = ${JSON.stringify(apiBase)};
 window.wimsNotice = (message, type = "info") => {
