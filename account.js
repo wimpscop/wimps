@@ -39,6 +39,7 @@ function initializeAccount() {
     setupReferral(user);
     setupProfileUpload(user);
     loadAccountData(user.email);
+    window.setInterval(() => loadAccountData(user.email), 30000);
     setupLogout();
 }
 

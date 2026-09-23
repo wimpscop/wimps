@@ -33,6 +33,7 @@ async function init() {
     toggleView(true);
     setupEventListeners();
     loadTransactions(user.email);
+    window.setInterval(() => loadTransactions(user.email), 30000);
 }
 
 function getUser() {
