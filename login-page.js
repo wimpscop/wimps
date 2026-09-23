@@ -34,6 +34,13 @@
             : "/api";
     })();
 
+    async function readApiResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) return response.json();
+        const text = await response.text();
+        return { msg: text.trim() || `Request failed with status ${response.status}` };
+    }
+
     function saveAuthenticatedUser(user) {
         localStorage.setItem("user", JSON.stringify({
             id: user.id,
@@ -114,7 +121,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
             });
-            const data = await response.json();
+            const data = await readApiResponse(response);
             closeAuthModal();
             if (!response.ok) return window.wimsNotice?.(data.msg || "Unable to start password reset.", "error");
             window.wimsNotice?.(data.msg || "Check your email for a password reset link.", "success");
@@ -132,7 +139,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: resetEmail, token, password })
             });
-            const data = await response.json();
+            const data = await readApiResponse(response);
             closeAuthModal();
             if (!response.ok) return window.wimsNotice?.(data.msg || "Password reset failed.", "error");
             window.wimsNotice?.(data.msg || "Password reset complete.", "success");
@@ -197,7 +204,7 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                const data = await res.json();
+                const data = await readApiResponse(res);
 
                 if (res.ok) {
                     window.wimsNotice?.("Login successful.", "success");
@@ -295,7 +302,7 @@
                     body: JSON.stringify({ fullname, email, password, referralCode: new URLSearchParams(window.location.search).get("ref") || "" })
                 });
 
-                const data = await res.json();
+                const data = await readApiResponse(res);
 
                 if (res.ok) {
                     window.wimsNotice?.("Account created successfully.", "success");
