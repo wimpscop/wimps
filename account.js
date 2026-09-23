@@ -114,6 +114,13 @@ function populateAccountInfo(user) {
 // ==========================
 async function loadAccountData(email) {
     try {
+        const wimpRes = await fetch(`${API_BASE}/wimp/wallet`, { headers: window.wimpsAuthHeaders() });
+        if (wimpRes.ok) {
+            const wimpData = await wimpRes.json();
+            const wimpBalance = document.getElementById("wimp-balance");
+            if (wimpBalance) wimpBalance.textContent = `${Number(wimpData.wallet?.balance || 0).toFixed(2)} WIMP`;
+        }
+
         // ===== WALLET =====
         const walletRes = await fetch(`${API_BASE}/wallet/${email}`, {
             headers: window.wimpsAuthHeaders()

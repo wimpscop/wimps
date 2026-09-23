@@ -16,7 +16,7 @@
     const labels = {
         dashboard: "Dashboard", orders: "Orders", bulk: "Bulk Purchase", comparison: "Provider Comparison",
         providers: "Providers", checkers: "Result Checkers", wallets: "Provider Wallets", customers: "Customers", email: "Email Customers", payments: "Payments",
-        pricing: "Pricing", reports: "Profit & Reports", logs: "API & Webhook Logs", settings: "Settings", audit: "Audit Logs", retention: "Data Retention"
+        pricing: "Pricing", wimp: "WIMP Rewards", reports: "Profit & Reports", logs: "API & Webhook Logs", settings: "Settings", audit: "Audit Logs", retention: "Data Retention"
     };
 
     const ordersPanel = document.querySelector('[data-panel="orders"]');
@@ -53,6 +53,7 @@
         if (adminToken && selected === "orders") loadOrders().catch((error) => showToast(error.message));
         if (adminToken && selected === "payments") loadPayments().catch((error) => showToast(error.message));
         if (adminToken && selected === "checkers") loadCheckers().catch((error) => showToast(error.message));
+        if (adminToken && selected === "wimp") loadWimpData().catch((error) => showToast(error.message));
     }
 
     document.querySelectorAll("[data-view]").forEach((element) => {
@@ -154,7 +155,7 @@
         const sources = [
             ["overview", loadOverview()], ["providers", loadProviders()], ["comparison", loadComparison()],
             ["orders", loadOrders()], ["activity", loadActivity()], ["customers", loadCustomers()], ["settings", loadSettings()],
-            ["bulk bundles", loadBulkBundles()], ["payments", loadPayments()]
+            ["bulk bundles", loadBulkBundles()], ["payments", loadPayments()], ["wimp rewards", loadWimpData()]
         ];
         const results = await Promise.allSettled(sources.map(([, request]) => request));
         const failed = results.map((result, index) => ({ result, name: sources[index][0] })).filter(({ result }) => result.status === "rejected");
@@ -442,6 +443,56 @@
             showToast(error.message || "Unable to delete customer.");
         }
     }
+
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
+    }
+
+    async function loadWimpData() {
+        const [settingsResponse, transactionsResponse] = await Promise.all([
+            fetch(`${adminApiBase}/admin/wimp/settings`, { headers: { "X-Admin-Token": adminToken } }),
+            fetch(`${adminApiBase}/admin/wimp/transactions?limit=200`, { headers: { "X-Admin-Token": adminToken } })
+        ]);
+        const settingsPayload = await settingsResponse.json();
+        const transactionsPayload = await transactionsResponse.json();
+        if (!settingsResponse.ok) throw new Error(settingsPayload.msg || "Unable to load WIMP settings");
+        if (!transactionsResponse.ok) throw new Error(transactionsPayload.msg || "Unable to load WIMP transactions");
+        const settings = settingsPayload.settings || {};
+        const form = document.getElementById("wimp-settings-form");
+        if (form) {
+            form.elements.enabled.checked = settings.enabled !== false;
+            form.elements.redemptionEnabled.checked = settings.redemptionEnabled !== false;
+            form.elements.rewardPerCompletedPurchase.value = (Number(settings.rewardPerCompletedPurchaseUnits || 0) / 100).toFixed(2);
+            form.elements.maximumDiscount.value = (Number(settings.maximumDiscountUnits || 0) / 100).toFixed(2);
+        }
+        const body = document.getElementById("wimp-transactions-body");
+        const rows = Array.isArray(transactionsPayload.data) ? transactionsPayload.data : [];
+        if (body) body.innerHTML = rows.length ? rows.map((entry) => `<tr><td>${escapeHtml(entry.userId)}</td><td>${escapeHtml(entry.type)}</td><td>${(Number(entry.amountUnits || 0) / 100).toFixed(2)}</td><td>${(Number(entry.balanceAfterUnits || 0) / 100).toFixed(2)}</td><td>${escapeHtml(entry.description)}</td><td>${entry.createdAt ? new Date(entry.createdAt).toLocaleString() : "—"}</td></tr>`).join("") : '<tr><td colspan="6">No WIMP ledger entries yet.</td></tr>';
+    }
+
+    document.getElementById("wimp-refresh-button")?.addEventListener("click", () => loadWimpData().then(() => showToast("WIMP data refreshed.")).catch((error) => showToast(error.message)));
+    document.getElementById("wimp-settings-form")?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        try {
+            const response = await fetch(`${adminApiBase}/admin/wimp/settings`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Token": adminToken }, body: JSON.stringify({ enabled: form.elements.enabled.checked, redemptionEnabled: form.elements.redemptionEnabled.checked, rewardPerCompletedPurchase: form.elements.rewardPerCompletedPurchase.value, maximumDiscount: form.elements.maximumDiscount.value }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.msg || "Unable to save WIMP settings");
+            showToast("WIMP settings saved.");
+        } catch (error) { showToast(error.message); }
+    });
+    document.getElementById("wimp-adjust-form")?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        try {
+            const response = await fetch(`${adminApiBase}/admin/wimp/adjust`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": adminToken, "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify({ email: form.elements.email.value, direction: form.elements.direction.value, amount: form.elements.amount.value, reason: form.elements.reason.value }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.msg || "Unable to adjust WIMP balance");
+            form.reset();
+            showToast("WIMP balance adjusted.");
+            await loadWimpData();
+        } catch (error) { showToast(error.message); }
+    });
 
     async function loadSettings() {
         const response = await fetch(`${adminApiBase}/admin/settings`, { headers: { "X-Admin-Token": adminToken } });

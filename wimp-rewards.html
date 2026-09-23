@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WIMP Rewards | WIMPS</title>
+  <link rel="stylesheet" href="wimp-rewards.css">
+</head>
+<body>
+  <main class="rewards-shell">
+    <nav><a href="index.html">WIMPS</a><a href="account.html">Account</a><a href="history.html">Orders</a></nav>
+    <header class="rewards-header">
+      <p class="eyebrow">LOYALTY PROGRAM</p>
+      <h1>WIMP Rewards</h1>
+      <p>Earn promotional points when eligible Wimps purchases are successfully delivered.</p>
+    </header>
+    <section class="rewards-balance" aria-live="polite">
+      <div><span class="label">Available balance</span><strong id="wimp-page-balance">0.00 WIMP</strong></div>
+      <a href="wimp-earn.html">How to earn</a>
+    </section>
+    <section class="notice-panel">
+      <h2>What WIMP Rewards are</h2>
+      <p>WIMP Rewards are promotional points provided by Wimps. They are not Ghanaian cedi, electronic money, cryptocurrency, or an investment. They cannot be exchanged for cash or transferred to other users. They can only be used for eligible Wimps products and discounts, subject to the Wimps Rewards Terms.</p>
+    </section>
+    <section class="rules-grid">
+      <article><h2>Earn WIMP</h2><p>Eligible completed data-bundle purchases can earn the reward configured by Wimps. Failed, cancelled, reversed, and refunded orders do not earn points.</p></article>
+      <article><h2>Spend WIMP</h2><p>Points can only reduce the price of eligible Wimps products. The available balance and final discount are always calculated by the server.</p></article>
+    </section>
+    <section class="ledger-panel">
+      <div class="section-heading"><h2>WIMP activity</h2><a href="wimp-spend.html">Spend WIMP</a></div>
+      <div id="wimp-ledger" aria-live="polite"><p>Sign in to view your WIMP activity.</p></div>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script src="wimp-rewards.js"></script>
+</body>
+</html>
