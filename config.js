@@ -57,5 +57,21 @@ window.wimpsCheckSession = () => {
 	window.wimpsSessionCheck = check.finally(() => { window.wimpsSessionCheck = null; });
 	return window.wimpsSessionCheck;
 };
+window.wimpsCheckConfigVersion = async () => {
+	try {
+		const configured = window.APP_CONFIG?.API_BASE;
+		const apiBase = configured ? String(configured).replace(/\/$/, "") : (/localhost|127\.0\.0\.1/.test(window.location.hostname) ? "http://localhost:5000/api" : "/api");
+		const response = await fetch(`${apiBase}/config/version`, { cache: "no-store" });
+		if (!response.ok) return;
+		const version = String((await response.json()).version || 0);
+		const previous = sessionStorage.getItem("wimps-config-version");
+		sessionStorage.setItem("wimps-config-version", version);
+		if (previous && previous !== version) window.location.reload();
+	} catch (error) {
+		// Configuration polling is best effort and must not block the page.
+	}
+};
 document.addEventListener("DOMContentLoaded", () => window.wimpsCheckSession());
 window.setInterval(() => window.wimpsCheckSession(), 60000);
+window.setInterval(() => window.wimpsCheckConfigVersion(), 30000);
+window.wimpsCheckConfigVersion();
