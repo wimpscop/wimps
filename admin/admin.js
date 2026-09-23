@@ -425,7 +425,22 @@
                 : '<option value="">No customer emails available</option>';
         }
         if (!body || !payload.data?.length) return;
-        body.innerHTML = payload.data.map((customer) => `<tr><td><strong>${customer.fullname || "—"}</strong></td><td>${customer.email || "—"}</td><td>GH₵ ${Number(customer.balance || 0).toFixed(2)}</td><td>${Number(customer.referralCount || 0)}</td><td>GH₵ ${Number(customer.referralCredits || 0).toFixed(2)}</td><td>${customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : "—"}</td></tr>`).join("");
+        body.innerHTML = payload.data.map((customer) => `<tr><td><strong>${customer.fullname || "—"}</strong></td><td>${customer.email || "—"}</td><td>GH₵ ${Number(customer.balance || 0).toFixed(2)}</td><td>${Number(customer.referralCount || 0)}</td><td>GH₵ ${Number(customer.referralCredits || 0).toFixed(2)}</td><td>${customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : "—"}</td><td><button type="button" class="secondary-button customer-delete-button" data-email="${encodeURIComponent(customer.email || "")}">Delete</button></td></tr>`).join("");
+        body.querySelectorAll(".customer-delete-button").forEach((button) => button.addEventListener("click", () => deleteCustomer(decodeURIComponent(button.dataset.email || ""))));
+    }
+
+    async function deleteCustomer(email) {
+        if (!email || !window.confirm(`Delete the customer account for ${email}? This also deletes their transaction history.`)) return;
+        try {
+            const response = await fetch(`${adminApiBase}/admin/customers/${encodeURIComponent(email)}`, { method: "DELETE", headers: { "X-Admin-Token": adminToken } });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.msg || "Unable to delete customer");
+            showToast(data.msg || "Customer deleted.");
+            await loadCustomers();
+            await loadOverview();
+        } catch (error) {
+            showToast(error.message || "Unable to delete customer.");
+        }
     }
 
     async function loadSettings() {
