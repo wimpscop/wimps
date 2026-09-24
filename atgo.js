@@ -343,6 +343,7 @@
   async function buyWithPaystack() {
     const p = currentPurchase;
     if (!p) return;
+    if (Number(p.total || 0) <= 0) return buyWithWallet();
 
     if (!(await ensurePaymentConfig())) return;
 
