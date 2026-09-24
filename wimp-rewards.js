@@ -3,6 +3,10 @@
   const authHeaders = () => window.wimpsAuthHeaders?.() || {};
   const balance = document.getElementById("wimp-page-balance");
   const ledger = document.getElementById("wimp-ledger");
+  document.getElementById("redeem-wimp-button")?.addEventListener("click", () => {
+    localStorage.setItem("wimpRedeemPending", "true");
+    window.location.href = "./mtn.html";
+  });
 
   async function loadRewards() {
     try {
