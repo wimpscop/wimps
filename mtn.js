@@ -291,6 +291,7 @@
     document.getElementById("modal-price-per-gb").textContent = `GHS ${pricePerGb.toFixed(2)}`;
     document.getElementById("modal-fee").textContent = `GHS ${fee.toFixed(2)}`;
     document.getElementById("modal-total").textContent = `GHS ${total.toFixed(2)}`;
+    updatePaymentButtons();
     const wimpInput = document.getElementById("wimp-discount");
     if (wimpInput) wimpInput.value = "0";
     fetch(`${API_BASE}/wimp/wallet`, { headers: window.wimpsAuthHeaders() }).then((response) => response.ok ? response.json() : null).then((data) => {
@@ -314,6 +315,15 @@
     p.total = Number((p.grossTotal - p.referralDiscount - p.wimpDiscount).toFixed(2));
     if (input) input.value = p.wimpDiscount.toFixed(2);
     document.getElementById("modal-total").textContent = `GHS ${p.total.toFixed(2)}`;
+    updatePaymentButtons();
+  }
+
+  function updatePaymentButtons() {
+    const free = Number(currentPurchase?.total || 0) <= 0;
+    const paystackButton = document.getElementById("buy-paystack-btn");
+    const walletButton = document.getElementById("buy-wallet-btn");
+    if (paystackButton) paystackButton.style.display = free ? "none" : "";
+    if (walletButton) walletButton.innerHTML = free ? '<i class="fas fa-star"></i> Complete with WIMP Rewards' : '<i class="fas fa-wallet"></i> Buy with Wallet';
   }
 
   function closeCheckoutModal() {
