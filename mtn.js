@@ -278,8 +278,10 @@
       network: getCurrentNetwork(),
       baseAmount,
       fee,
-      total
-      ,referralDiscount
+      grossTotal,
+      total,
+      referralDiscount,
+      wimpBalance: 0
     };
 
     const bundleLabel = Number(plan.volumeGb) > 0 ? formatVolumeLabel(Number(plan.volumeGb)) : (plan.name || `${plan.volume || plan.volume_mb || "Bundle"}`);
@@ -289,8 +291,29 @@
     document.getElementById("modal-price-per-gb").textContent = `GHS ${pricePerGb.toFixed(2)}`;
     document.getElementById("modal-fee").textContent = `GHS ${fee.toFixed(2)}`;
     document.getElementById("modal-total").textContent = `GHS ${total.toFixed(2)}`;
+    const wimpInput = document.getElementById("wimp-discount");
+    if (wimpInput) wimpInput.value = "0";
+    fetch(`${API_BASE}/wimp/wallet`, { headers: window.wimpsAuthHeaders() }).then((response) => response.ok ? response.json() : null).then((data) => {
+      if (!data) return;
+      currentPurchase.wimpBalance = Number(data.wallet?.balance || 0);
+      const help = document.getElementById("wimp-balance-help");
+      if (help) help.textContent = `Available: ${currentPurchase.wimpBalance.toFixed(2)} WIMP`;
+      if (wimpInput) wimpInput.max = String(Math.min(currentPurchase.wimpBalance, Math.max(0, currentPurchase.grossTotal - currentPurchase.referralDiscount)));
+    }).catch(() => {});
 
     document.getElementById("checkout-modal").style.display = "flex";
+  }
+
+  function updatePurchaseTotal() {
+    const p = currentPurchase;
+    if (!p) return;
+    const input = document.getElementById("wimp-discount");
+    const requested = Math.max(0, Number(input?.value || 0));
+    const discount = Math.min(requested, Number(p.wimpBalance || 0), Math.max(0, p.grossTotal - p.referralDiscount));
+    p.wimpDiscount = Number(discount.toFixed(2));
+    p.total = Number((p.grossTotal - p.referralDiscount - p.wimpDiscount).toFixed(2));
+    if (input) input.value = p.wimpDiscount.toFixed(2);
+    document.getElementById("modal-total").textContent = `GHS ${p.total.toFixed(2)}`;
   }
 
   function closeCheckoutModal() {
@@ -320,6 +343,7 @@
           plan_id: p.plan.id,
           quantity: 1,
           amount: p.total,
+          wimpUnits: Math.round(Number(p.wimpDiscount || 0) * 100),
           request_id: `WIMPS_${Date.now()}`
         })
       });
@@ -379,6 +403,7 @@
                 volume: p.plan.volumeGb || p.plan.volume,
                 quantity: 1,
                 amount: p.total,
+                wimpUnits: Math.round(Number(p.wimpDiscount || 0) * 100),
                 request_id: `WIMPS_${Date.now()}`,
                 reference: response.reference
               })
@@ -484,6 +509,7 @@
     updateWallet();
 
     document.getElementById("buy-wallet-btn")?.addEventListener("click", buyWithWallet);
+    document.getElementById("wimp-discount")?.addEventListener("input", updatePurchaseTotal);
     document.getElementById("buy-paystack-btn")?.addEventListener("click", buyWithPaystack);
     document.getElementById("deposit-paystack")?.addEventListener("click", depositWithPaystack);
     document.getElementById("modal-close-btn")?.addEventListener("click", closeCheckoutModal);
