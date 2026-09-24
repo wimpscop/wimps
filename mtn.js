@@ -373,6 +373,7 @@
       closeCheckoutModal();
       updateWallet();
       loadBundleOffers();
+      window.setTimeout(() => window.location.reload(), 250);
     } catch (err) {
       console.error(err);
       window.wimsAlert("Network error while processing the purchase.");
@@ -435,6 +436,7 @@
             closeCheckoutModal();
             updateWallet();
             loadBundleOffers();
+            window.setTimeout(() => window.location.reload(), 250);
           } catch (err) {
             console.error(err);
             window.wimsNotice?.("Payment completed, but the server could not verify it. Please check your transaction history before trying again.", "error");
