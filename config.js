@@ -1,5 +1,5 @@
 window.APP_CONFIG = window.APP_CONFIG || {};
-window.APP_CONFIG.API_BASE = "https://wimps-api.onrender.com/api";
+window.APP_CONFIG.API_BASE = "https://backend-o5q5.onrender.com/api";
 window.wimsNotice = (message, type = "info") => {
 	const notice = document.createElement("div");
 	notice.className = `wims-notice wims-notice-${type}`;
