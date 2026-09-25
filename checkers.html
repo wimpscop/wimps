@@ -1,25 +1,81 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GH">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Result Checkers | WIMPS</title>
+  <meta name="description" content="Buy WAEC and BECE result checker cards on WIMPS Ghana. Live stock and prices from DataMart GH. Instant delivery to your email or phone.">
+  <meta name="keywords" content="WAEC result checker Ghana, BECE result checker, buy result checker online Ghana, DataMart result checkers">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#6C5CE7">
+  <link rel="canonical" href="https://wimps.store/checkers.html">
+  <link rel="alternate" hreflang="en-GH" href="https://wimps.store/checkers.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WIMPS">
+  <meta property="og:title" content="WAEC & BECE Result Checkers - WIMPS Ghana">
+  <meta property="og:description" content="Buy WAEC and BECE result checker cards instantly. Live stock from DataMart GH, secure Paystack payment, instant delivery.">
+  <meta property="og:url" content="https://wimps.store/checkers.html">
+  <meta property="og:image" content="https://wimps.store/assets/og-checkers.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Result Checkers - WIMPS Ghana">
+  <meta name="twitter:description" content="WAEC & BECE checker cards with instant delivery. Live stock, best prices.">
+  <title>Result Checkers | WIMPS Ghana</title>
+  <link rel="preload" as="style" href="checkers.css">
   <link rel="stylesheet" href="checkers.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Result Checkers",
+    "description": "Buy WAEC and BECE result checker cards on WIMPS Ghana",
+    "publisher": { "@type": "Organization", "name": "WIMPS" },
+    "mainEntity": {
+      "@type": "Service",
+      "serviceType": "Result Checker Card Sales",
+      "provider": { "@type": "Organization", "name": "WIMPS" },
+      "areaServed": "GH"
+    }
+  }
+  </script>
 </head>
 <body>
-  <main class="checker-page">
-    <nav class="checker-nav"><a href="index.html">Home</a><a href="history.html">History</a><a href="checkers.html">Result Checkers</a><a href="mtn.html">MTN</a><a href="atgo.html">AirtelTigo</a><a href="telecel.html">Telecel</a><a href="about.html">About</a><a href="account.html">Account</a></nav>
+  <main class="checker-page" role="main">
+    <nav class="checker-nav" role="navigation" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="history.html">History</a>
+      <span aria-hidden="true">/</span>
+      <a href="checkers.html" aria-current="page">Result Checkers</a>
+      <span aria-hidden="true">/</span>
+      <a href="mtn.html">MTN</a>
+      <span aria-hidden="true">/</span>
+      <a href="atgo.html">AirtelTigo</a>
+      <span aria-hidden="true">/</span>
+      <a href="telecel.html">Telecel</a>
+      <span aria-hidden="true">/</span>
+      <a href="about.html">About</a>
+      <span aria-hidden="true">/</span>
+      <a href="account.html">Account</a>
+    </nav>
     <a class="back-link" href="index.html">Back to WIMPS</a>
     <header class="checker-heading">
       <p class="eyebrow">DATAMART GH</p>
       <h1>Result checker cards</h1>
       <p>Choose a WAEC or BECE checker card. Stock and prices are loaded live.</p>
     </header>
-    <section class="checker-grid" id="checker-products" aria-live="polite">
+    <section class="checker-grid" id="checker-products" aria-live="polite" aria-label="Available checker cards">
       <p class="loading">Loading available cards...</p>
     </section>
   </main>
   <script src="config.js"></script>
   <script src="checkers.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>

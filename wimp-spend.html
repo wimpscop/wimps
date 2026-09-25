@@ -1,2 +1,46 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spend WIMP | WIMPS</title><link rel="stylesheet" href="wimp-rewards.css"></head><body><main class="rewards-shell"><nav><a href="index.html">WIMPS</a><a href="wimp-rewards.html">WIMP Rewards</a><a href="account.html">Account</a></nav><header class="rewards-header"><p class="eyebrow">WIMP REWARDS</p><h1>Spend WIMP</h1><p>Use eligible promotional points for discounts on Wimps products.</p></header><section class="notice-panel"><h2>Redemption rules</h2><p>Discounts are calculated and checked by the Wimps server. Your balance can never become negative. Redemption requests cannot be duplicated, transferred, exchanged for cash, or used outside eligible Wimps products.</p><p>Choose a bundle on the shop page to see the available server-calculated discount. WIMP Rewards are promotional points provided by Wimps, not Ghanaian cedi, electronic money, cryptocurrency, or an investment.</p><a href="mtn.html" style="color:var(--green);font-weight:700">Shop eligible bundles</a></section></main><script src="config.js"></script></body></html>
+<html lang="en-GH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Spend your WIMP Rewards on WIMPS Ghana. Use promotional points for discounts on eligible data bundles and products.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F39C12">
+  <link rel="canonical" href="https://wimps.store/wimp-spend.html">
+  <title>Spend WIMP | WIMPS Ghana</title>
+  <link rel="preload" as="style" href="wimp-rewards.css">
+  <link rel="stylesheet" href="wimp-rewards.css">
+</head>
+<body>
+  <main class="rewards-shell" role="main">
+    <nav role="navigation" aria-label="Breadcrumb">
+      <a href="index.html">WIMPS</a>
+      <span aria-hidden="true">/</span>
+      <a href="wimp-rewards.html">WIMP Rewards</a>
+      <span aria-hidden="true">/</span>
+      <a href="account.html">Account</a>
+    </nav>
+    <header class="rewards-header">
+      <p class="eyebrow">WIMP REWARDS</p>
+      <h1>Spend WIMP</h1>
+      <p>Use eligible promotional points for discounts on Wimps products.</p>
+    </header>
+    <section class="notice-panel">
+      <h2>Redemption rules</h2>
+      <p>Discounts are calculated and checked by the Wimps server. Your balance can never become negative. Redemption requests cannot be duplicated, transferred, exchanged for cash, or used outside eligible Wimps products.</p>
+      <p>Choose a bundle on the shop page to see the available server-calculated discount. WIMP Rewards are promotional points provided by Wimps, not Ghanaian cedi, electronic money, cryptocurrency, or an investment.</p>
+      <a href="mtn.html" style="color:var(--green);font-weight:700">Shop eligible bundles</a>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

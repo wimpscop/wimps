@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://wimps.store/</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wimps.store/" />
+  </url>
+  <url>
+    <loc>https://wimps.store/about.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/about.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/mtn.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/mtn.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/telecel.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/telecel.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/atgo.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/atgo.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/checkers.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/checkers.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/wimp-rewards.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/wimp-rewards.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/wimp-spend.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/wimp-spend.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/wimp-earn.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/wimp-earn.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/history.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/history.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/account.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/account.html" />
+  </url>
+  <url>
+    <loc>https://wimps.store/login-page.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en-GH" href="https://wimps.store/login-page.html" />
+  </url>
+</urlset>

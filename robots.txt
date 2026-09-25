@@ -1,0 +1,32 @@
+# WIMPS - Ghana Mobile Data Bundles
+# Robots.txt for search engine crawlers
+
+User-agent: *
+Allow: /
+
+# Disallow private/user-specific pages
+Disallow: /account.html
+Disallow: /history.html
+Disallow: /login-page.html
+Disallow: /admin/
+Disallow: /api/
+Disallow: /wimp-spend.html
+Disallow: /wimp-rewards.html
+Disallow: /wimp-earn.html
+
+# Allow important pages
+Allow: /index.html
+Allow: /about.html
+Allow: /mtn.html
+Allow: /telecel.html
+Allow: /atgo.html
+Allow: /checkers.html
+
+# Sitemap location
+Sitemap: https://wimps.store/sitemap.xml
+
+# Host directive (optional, for Yandex)
+Host: https://wimps.store
+
+# Crawl delay (optional, be respectful)
+Crawl-delay: 10

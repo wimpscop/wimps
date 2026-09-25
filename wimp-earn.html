@@ -1,2 +1,45 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Earn WIMP | WIMPS</title><link rel="stylesheet" href="wimp-rewards.css"></head><body><main class="rewards-shell"><nav><a href="index.html">WIMPS</a><a href="wimp-rewards.html">WIMP Rewards</a><a href="account.html">Account</a></nav><header class="rewards-header"><p class="eyebrow">WIMP REWARDS</p><h1>Earn WIMP</h1><p>Earn promotional points after eligible Wimps purchases are paid and successfully delivered.</p></header><section class="notice-panel"><h2>How earning works</h2><p>Wimps checks payment confirmation and provider delivery on the server. A completed eligible order can receive the configured reward once. Failed, cancelled, reversed, and refunded orders do not earn WIMP.</p><p>WIMP Rewards are promotional points provided by Wimps. They are not Ghanaian cedi, electronic money, cryptocurrency, or an investment. They cannot be exchanged for cash or transferred to other users. They can only be used for eligible Wimps products and discounts, subject to the Wimps Rewards Terms.</p></section></main><script src="config.js"></script></body></html>
+<html lang="en-GH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Learn how to earn WIMP Rewards on WIMPS Ghana. Earn promotional points after eligible data bundle purchases are paid and successfully delivered.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F39C12">
+  <link rel="canonical" href="https://wimps.store/wimp-earn.html">
+  <title>Earn WIMP | WIMPS Ghana</title>
+  <link rel="preload" as="style" href="wimp-rewards.css">
+  <link rel="stylesheet" href="wimp-rewards.css">
+</head>
+<body>
+  <main class="rewards-shell" role="main">
+    <nav role="navigation" aria-label="Breadcrumb">
+      <a href="index.html">WIMPS</a>
+      <span aria-hidden="true">/</span>
+      <a href="wimp-rewards.html">WIMP Rewards</a>
+      <span aria-hidden="true">/</span>
+      <a href="account.html">Account</a>
+    </nav>
+    <header class="rewards-header">
+      <p class="eyebrow">WIMP REWARDS</p>
+      <h1>Earn WIMP</h1>
+      <p>Earn promotional points after eligible Wimps purchases are paid and successfully delivered.</p>
+    </header>
+    <section class="notice-panel">
+      <h2>How earning works</h2>
+      <p>Wimps checks payment confirmation and provider delivery on the server. A completed eligible order can receive the configured reward once. Failed, cancelled, reversed, and refunded orders do not earn WIMP.</p>
+      <p>WIMP Rewards are promotional points provided by Wimps. They are not Ghanaian cedi, electronic money, cryptocurrency, or an investment. They cannot be exchanged for cash or transferred to other users. They can only be used for eligible Wimps products and discounts, subject to the Wimps Rewards Terms.</p>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

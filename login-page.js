@@ -14,12 +14,14 @@
             e.preventDefault();
             loginBox.classList.remove('active');
             signupBox.classList.add('active');
+            history.replaceState(null, '', '#signup');
         });
 
         toggleLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             signupBox.classList.remove('active');
             loginBox.classList.add('active');
+            history.replaceState(null, '', '#login');
         });
     }
 
@@ -102,7 +104,7 @@
         event.preventDefault();
         openAuthModal({
             title: "Reset password",
-            text: "Enter the email address linked to your account and we’ll send a reset link.",
+            text: "Enter the email address linked to your account and we'll send a reset link.",
             label: "Email address",
             placeholder: "you@example.com",
             action: "forgot",
@@ -116,15 +118,20 @@
         if (action === "forgot") {
             const email = String(authModalInput.value || "").trim();
             if (!email) return window.wimsAlert("Please enter your email address.");
-            const response = await fetch(`${API_BASE}/auth/forgot-password`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
-            });
-            const data = await readApiResponse(response);
-            closeAuthModal();
-            if (!response.ok) return window.wimsNotice?.(data.msg || "Unable to start password reset.", "error");
-            window.wimsNotice?.(data.msg || "Check your email for a password reset link.", "success");
+            try {
+                const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+                const data = await readApiResponse(response);
+                closeAuthModal();
+                if (!response.ok) return window.wimsNotice?.(data.msg || "Unable to start password reset.", "error");
+                window.wimsNotice?.(data.msg || "Check your email for a password reset link.", "success");
+            } catch (err) {
+                closeAuthModal();
+                window.wimsNotice?.("Unable to connect to server. Please try again.", "error");
+            }
             return;
         }
 
@@ -134,16 +141,21 @@
             const token = new URLSearchParams(window.location.search).get("reset") || "";
             if (!password || password.length < 6) return window.wimsAlert("Password must be at least 6 characters.");
             if (!token || !resetEmail) return window.wimsAlert("The reset link is missing required information.");
-            const response = await fetch(`${API_BASE}/auth/reset-password`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: resetEmail, token, password })
-            });
-            const data = await readApiResponse(response);
-            closeAuthModal();
-            if (!response.ok) return window.wimsNotice?.(data.msg || "Password reset failed.", "error");
-            window.wimsNotice?.(data.msg || "Password reset complete.", "success");
-            setTimeout(() => window.location.href = "./login-page.html#login", 800);
+            try {
+                const response = await fetch(`${API_BASE}/auth/reset-password`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: resetEmail, token, password })
+                });
+                const data = await readApiResponse(response);
+                closeAuthModal();
+                if (!response.ok) return window.wimsNotice?.(data.msg || "Password reset failed.", "error");
+                window.wimsNotice?.(data.msg || "Password reset complete.", "success");
+                setTimeout(() => window.location.href = "./login-page.html#login", 800);
+            } catch (err) {
+                closeAuthModal();
+                window.wimsNotice?.("Unable to connect to server. Please try again.", "error");
+            }
         }
     });
 
@@ -162,10 +174,7 @@
         });
     }
 
-    const DEMO_USERS = {};
-
-    const loginForm = document.getElementById("loginForm");
-
+    // Password toggle functionality
     document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
         toggle.addEventListener('click', () => {
             const input = document.getElementById(toggle.dataset.passwordToggle);
@@ -177,6 +186,54 @@
         });
     });
 
+    // Signup email existence check
+    const signupEmailInput = document.getElementById('signup-email');
+    const signupEmailHint = document.getElementById('signup-email-hint');
+    let emailCheckDebounce = null;
+
+    if (signupEmailInput && signupEmailHint) {
+        signupEmailInput.addEventListener('blur', async () => {
+            const email = String(signupEmailInput.value || "").trim().toLowerCase();
+            if (!email || !email.includes('@')) return;
+
+            clearTimeout(emailCheckDebounce);
+            emailCheckDebounce = setTimeout(async () => {
+                signupEmailHint.textContent = 'Checking...';
+                signupEmailHint.style.color = '#666';
+
+                try {
+                    const response = await fetch(`${API_BASE}/auth/check-email`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email })
+                    });
+                    const data = await readApiResponse(response);
+
+                    if (data.exists) {
+                        signupEmailHint.textContent = 'An account with this email already exists. Please login instead.';
+                        signupEmailHint.style.color = '#a83232';
+                        signupEmailInput.setAttribute('aria-invalid', 'true');
+                    } else {
+                        signupEmailHint.textContent = 'Email is available';
+                        signupEmailHint.style.color = '#16794c';
+                        signupEmailInput.removeAttribute('aria-invalid');
+                    }
+                } catch (err) {
+                    signupEmailHint.textContent = '';
+                    signupEmailInput.removeAttribute('aria-invalid');
+                }
+            }, 500);
+        });
+
+        // Clear hint on focus
+        signupEmailInput.addEventListener('focus', () => {
+            clearTimeout(emailCheckDebounce);
+            signupEmailHint.textContent = '';
+            signupEmailInput.removeAttribute('aria-invalid');
+        });
+    }
+
+    const loginForm = document.getElementById("loginForm");
 
     if (loginForm) {
         loginForm.addEventListener("submit", async (e) => {
@@ -196,6 +253,7 @@
                     submitButton.disabled = true;
                     submitButton.textContent = "Logging in...";
                 }
+
                 const res = await fetch(`${API_BASE}/auth/login`, {
                     method: "POST",
                     headers: {
@@ -224,39 +282,15 @@
                     return;
                 }
 
-                if (DEMO_USERS[email] && DEMO_USERS[email].password === password) {
-                    const user = {
-                        id: DEMO_USERS[email].id,
-                        fullname: DEMO_USERS[email].fullname,
-                        email: DEMO_USERS[email].email,
-                        balance: DEMO_USERS[email].balance || 0,
-                        createdAt: DEMO_USERS[email].createdAt
-                    };
-                    localStorage.setItem("user", JSON.stringify(user));
-                    window.wimsNotice?.("Login successful.", "success");
-                    window.location.href = "./account.html";
-                    return;
+                // Check if error is about user not existing
+                if (data.msg && data.msg.toLowerCase().includes('invalid credentials')) {
+                    window.wimsAlert("Invalid email or password. Please check your credentials.");
+                } else {
+                    window.wimsAlert(data.msg || "Login failed");
                 }
-
-                window.wimsAlert(data.notice ? `${data.msg || "Login failed"} ${data.notice}` : (data.msg || "Login failed"));
             } catch (err) {
-                const demoUser = DEMO_USERS[email];
-                if (demoUser && demoUser.password === password) {
-                    const user = {
-                        id: demoUser.id,
-                        fullname: demoUser.fullname,
-                        email: demoUser.email,
-                        balance: demoUser.balance || 0,
-                        createdAt: demoUser.createdAt
-                    };
-                    localStorage.setItem("user", JSON.stringify(user));
-                    window.wimsNotice?.("Login successful.", "success");
-                    window.location.href = "./account.html";
-                    return;
-                }
-
                 console.error(err);
-                window.wimsAlert("The server is unavailable right now.");
+                window.wimsAlert("Unable to connect to server. Please check your internet connection and try again.");
             } finally {
                 const submitButton = loginForm.querySelector("button[type='submit']");
                 if (submitButton) {
@@ -293,13 +327,30 @@
                 return;
             }
 
+            // Check if email hint shows account exists
+            if (signupEmailHint && signupEmailHint.textContent.includes('already exists')) {
+                window.wimsAlert("An account with this email already exists. Please login instead.");
+                return;
+            }
+
             try {
+                const submitButton = signupForm.querySelector("button[type='submit']");
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = "Creating account...";
+                }
+
                 const res = await fetch(`${API_BASE}/auth/register`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ fullname, email, password, referralCode: new URLSearchParams(window.location.search).get("ref") || "" })
+                    body: JSON.stringify({
+                        fullname,
+                        email,
+                        password,
+                        referralCode: new URLSearchParams(window.location.search).get("ref") || ""
+                    })
                 });
 
                 const data = await readApiResponse(res);
@@ -310,15 +361,26 @@
                     loginBox.classList.add('active');
                     document.getElementById('email').value = email;
                     document.getElementById('email').focus();
+                    history.replaceState(null, '', '#login');
                 } else {
-                    window.wimsAlert(data.msg || "Signup failed.");
+                    if (data.msg && data.msg.toLowerCase().includes('already exists')) {
+                        window.wimsAlert("An account with this email already exists. Please login instead.");
+                        signupEmailHint.textContent = 'An account with this email already exists. Please login instead.';
+                        signupEmailHint.style.color = '#a83232';
+                    } else {
+                        window.wimsAlert(data.msg || "Signup failed.");
+                    }
                 }
-
             } catch (err) {
                 console.error(err);
-                window.wimsAlert("The server is unavailable right now.");
+                window.wimsAlert("Unable to connect to server. Please check your internet connection and try again.");
+            } finally {
+                const submitButton = signupForm.querySelector("button[type='submit']");
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Sign Up";
+                }
             }
         });
     }
 })();
-

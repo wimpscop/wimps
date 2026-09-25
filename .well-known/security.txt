@@ -1,0 +1,12 @@
+# Security.txt for WIMPS
+# https://securitytxt.org/
+
+Contact: mailto:security@wimps.store
+Contact: https://wimps.store/about.html#contact
+Encryption: https://wimps.store/assets/pgp-key.asc
+Acknowledgments: https://wimps.store/security.html#acknowledgments
+Policy: https://wimps.store/security.html
+Hiring: https://wimps.store/careers.html
+Expires: 2027-09-24T00:00:00.000Z
+Preferred-Languages: en, tw
+Canonical: https://wimps.store/.well-known/security.txt

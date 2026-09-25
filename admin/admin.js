@@ -465,6 +465,7 @@
             form.elements.autoCompleteEnabled.checked = settings.autoCompleteEnabled !== false;
             form.elements.autoCompleteHours.value = Number(settings.autoCompleteHours || 5);
             form.elements.rewardPerCompletedPurchase.value = (Number(settings.rewardPerCompletedPurchaseUnits || 0) / 100).toFixed(2);
+            form.elements.minimumRedemption.value = (Number(settings.minimumRedemptionUnits || 0) / 100).toFixed(2);
             form.elements.maximumDiscount.value = (Number(settings.maximumDiscountUnits || 0) / 100).toFixed(2);
         }
         const body = document.getElementById("wimp-transactions-body");
@@ -477,7 +478,7 @@
         event.preventDefault();
         const form = event.currentTarget;
         try {
-            const response = await fetch(`${adminApiBase}/admin/wimp/settings`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Token": adminToken }, body: JSON.stringify({ enabled: form.elements.enabled.checked, redemptionEnabled: form.elements.redemptionEnabled.checked, autoCompleteEnabled: form.elements.autoCompleteEnabled.checked, autoCompleteHours: form.elements.autoCompleteHours.value, rewardPerCompletedPurchase: form.elements.rewardPerCompletedPurchase.value, maximumDiscount: form.elements.maximumDiscount.value }) });
+            const response = await fetch(`${adminApiBase}/admin/wimp/settings`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Token": adminToken }, body: JSON.stringify({ enabled: form.elements.enabled.checked, redemptionEnabled: form.elements.redemptionEnabled.checked, autoCompleteEnabled: form.elements.autoCompleteEnabled.checked, autoCompleteHours: form.elements.autoCompleteHours.value, rewardPerCompletedPurchase: form.elements.rewardPerCompletedPurchase.value, minimumRedemption: form.elements.minimumRedemption.value, maximumDiscount: form.elements.maximumDiscount.value }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data.msg || "Unable to save WIMP settings");
             showToast("WIMP settings saved.");

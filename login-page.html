@@ -1,122 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GH">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - WIMPS</title>
+    <meta name="description" content="Sign in to your WIMPS Ghana account or create a new one. Access your data bundle history, wallet, WIMP rewards, and referral program.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#087a55">
+    <link rel="canonical" href="https://wimps.store/login-page.html">
+    <title>Login - WIMPS Ghana</title>
+    <link rel="preload" as="style" href="login-page.css">
+    <link rel="preload" as="style" href="responsive.css">
     <link rel="stylesheet" href="login-page.css">
     <link rel="stylesheet" href="responsive.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 
 <body>
     <!-- Header -->
-    <section class="header">
-        <a href="index.html">WIMPS</a>
-        <div>
+    <header class="header" role="banner">
+        <a href="index.html" class="logo-link" aria-label="WIMPS Home">
+            <span class="logo-text">WIMPS</span>
+        </a>
+
+        <nav class="nav-wrapper" role="navigation" aria-label="Main navigation">
             <ul id="navbar">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="./history.html">History</a></li>
                 <li><a href="./checkers.html">Result Checkers</a></li>
-                <li><a href="./mtn.html" class="rmv">Shop</a></li>
+                <li><a href="./mtn.html">Shop</a></li>
                 <li><a href="./about.html">About</a></li>
                 <li><a href="./account.html">Account</a></li>
                 <a href="#" id="close"><i class="far fa-times"></i></a>
             </ul>
-        </div>
+        </nav>
+
         <div id="mobile">
-            <a href="account.html" class="a">Account</a>
-            <i id="bar" class="fas fa-outdent"></i>
+            <a href="account.html" class="mobile-account" aria-label="Account">
+                <i class="fas fa-user"></i>
+            </a>
+            <i id="bar" class="fas fa-bars" aria-label="Menu"></i>
         </div>
-    </section>
+    </header>
 
     <!-- Auth Container -->
-    <div class="auth-container">
-        <div class="auth-box">
-            <div id="auth-modal" class="auth-modal hidden" aria-hidden="true">
-                <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
-                    <button type="button" class="auth-modal-close" id="auth-modal-close" aria-label="Close">&times;</button>
-                    <h3 id="auth-modal-title">Reset password</h3>
-                    <p id="auth-modal-text">We’ll email you a secure reset link.</p>
-                    <form id="auth-modal-form">
-                        <label id="auth-modal-label" for="auth-modal-input">Email address</label>
-                        <input id="auth-modal-input" type="email" placeholder="you@example.com" required>
-                        <input id="auth-modal-password" class="hidden" type="password" placeholder="New password" minlength="6">
-                        <div class="auth-modal-actions">
-                            <button type="button" class="btn-secondary" id="auth-modal-cancel">Cancel</button>
-                            <button type="submit" class="btn-submit btn-modal">Send</button>
+    <main role="main">
+        <div class="auth-container">
+            <div class="auth-box">
+                <div id="auth-modal" class="auth-modal hidden" aria-hidden="true">
+                    <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+                        <button type="button" class="auth-modal-close" id="auth-modal-close" aria-label="Close">&times;</button>
+                        <h3 id="auth-modal-title">Reset password</h3>
+                        <p id="auth-modal-text">We'll email you a secure reset link.</p>
+                        <form id="auth-modal-form">
+                            <label id="auth-modal-label" for="auth-modal-input">Email address</label>
+                            <input id="auth-modal-input" type="email" placeholder="you@example.com" required>
+                            <input id="auth-modal-password" class="hidden" type="password" placeholder="New password" minlength="6">
+                            <div class="auth-modal-actions">
+                                <button type="button" class="btn-secondary" id="auth-modal-cancel">Cancel</button>
+                                <button type="submit" class="btn-submit btn-modal">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <div class="form-box login-form active">
+                    <h2>Login</h2>
+                    <form id="loginForm" novalidate>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="Enter your email" required autocomplete="email">
                         </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="password-field">
+                                <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                                <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="remember-forgot">
+                            <label><input type="checkbox"> Remember me</label>
+                            <a href="#" id="forgot-password-link">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn-submit">Login</button>
                     </form>
+                    <p class="toggle-text">Don't have an account? <a href="#" id="toggle-signup">Sign up here</a></p>
+                </div>
+
+                <!-- Signup Form -->
+                <div class="form-box signup-form">
+                    <h2>Create Account</h2>
+                    <form id="signupForm" novalidate>
+                        <div class="form-group">
+                            <label for="signup-fullname">Full Name</label>
+                            <input type="text" id="signup-fullname" placeholder="Enter your full name" required autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-email">Email Address</label>
+                            <input type="email" id="signup-email" placeholder="Enter your email" required autocomplete="email" aria-describedby="signup-email-hint">
+                            <small id="signup-email-hint" class="form-hint"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <div class="password-field">
+                                <input type="password" id="signup-password" placeholder="Create a password" required autocomplete="new-password" minlength="6">
+                                <button type="button" class="password-toggle" data-password-toggle="signup-password" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-confirm">Confirm Password</label>
+                            <div class="password-field">
+                                <input type="password" id="signup-confirm" placeholder="Confirm your password" required autocomplete="new-password">
+                                <button type="button" class="password-toggle" data-password-toggle="signup-confirm" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="terms">
+                            <label><input type="checkbox" required> I agree to the <a href="./about.html">Terms & Conditions</a></label>
+                        </div>
+                        <button type="submit" class="btn-submit">Sign Up</button>
+                    </form>
+                    <p class="toggle-text">Already have an account? <a href="#" id="toggle-login">Login here</a></p>
                 </div>
             </div>
-            <!-- Login Form -->
-            <div class="form-box login-form active">
-                <h2>Login</h2>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="password-field">
-                            <input type="password" id="password" placeholder="Enter your password" required>
-                            <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password"><i class="fas fa-eye"></i></button>
-                        </div>
-                    </div>
-                    <div class="remember-forgot">
-                        <label><input type="checkbox"> Remember me</label>
-                        <a href="#" id="forgot-password-link">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="btn-submit">Login</button>
-                </form>
-                <p class="toggle-text">Don't have an account? <a href="#" id="toggle-signup">Sign up here</a></p>
-            </div>
-
-            <!-- Signup Form -->
-            <div class="form-box signup-form">
-                <h2>Create Account</h2>
-                <form id="signupForm">
-                    <div class="form-group">
-                        <label for="signup-fullname">Full Name</label>
-                        <input type="text" id="signup-fullname" placeholder="Enter your full name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-email">Email Address</label>
-                        <input type="email" id="signup-email" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-password">Password</label>
-                        <div class="password-field">
-                            <input type="password" id="signup-password" placeholder="Create a password" required>
-                            <button type="button" class="password-toggle" data-password-toggle="signup-password" aria-label="Show password"><i class="fas fa-eye"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-confirm">Confirm Password</label>
-                        <div class="password-field">
-                            <input type="password" id="signup-confirm" placeholder="Confirm your password" required>
-                            <button type="button" class="password-toggle" data-password-toggle="signup-confirm" aria-label="Show password"><i class="fas fa-eye"></i></button>
-                        </div>
-                    </div>
-                    <div class="terms">
-                        <label><input type="checkbox" required> I agree to the Terms & Conditions</label>
-                    </div>
-                    <button type="submit" class="btn-submit">Sign Up</button>
-                </form>
-                <p class="toggle-text">Already have an account? <a href="#" id="toggle-login">Login here</a></p>
-            </div>
         </div>
-    </div>
+    </main>
 
     <script src="config.js?v=5"></script>
     <script src="nav.js?v=5"></script>
     <script src="home-page.js?v=5"></script>
     <script src="login-page.js?v=5"></script>
-
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    </script>
 </body>
 </html>
-
