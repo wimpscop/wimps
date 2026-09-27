@@ -29,6 +29,36 @@
       <div><span class="label">Available balance</span><strong id="wimp-page-balance">0.00 WIMP</strong></div>
       <a href="wimp-earn.html">How to earn</a>
     </section>
+
+    <section class="token-card" aria-label="WIMP token balance">
+      <div class="token-header">
+        <div>
+          <p class="eyebrow">PLATFORM TOKEN</p>
+          <h2>WIMP Token</h2>
+        </div>
+        <span class="token-badge">App balance</span>
+      </div>
+      <div class="token-balance-row">
+        <strong id="wimp-token-balance">0.00 WIMP</strong>
+        <span>Available to spend on platform purchases</span>
+      </div>
+      <div class="token-actions">
+        <form id="wimp-buy-form" class="token-form">
+          <label for="token-buy-amount">Buy WIMP</label>
+          <div class="token-input-row">
+            <input id="token-buy-amount" type="number" min="1" step="1" value="50" aria-label="WIMP purchase amount">
+            <button type="submit">Buy</button>
+          </div>
+        </form>
+        <form id="wimp-spend-form" class="token-form">
+          <label for="token-spend-amount">Spend WIMP</label>
+          <div class="token-input-row">
+            <input id="token-spend-amount" type="number" min="1" step="1" value="10" aria-label="WIMP spend amount">
+            <button type="submit">Use</button>
+          </div>
+        </form>
+      </div>
+    </section>
     <section class="notice-panel">
       <h2>What WIMP Rewards are</h2>
       <p>WIMP Rewards are promotional points provided by Wimps. They are not Ghanaian cedi, electronic money, cryptocurrency, or an investment. They cannot be exchanged for cash or transferred to other users. They can only be used for eligible Wimps products and discounts, subject to the Wimps Rewards Terms.</p>
@@ -44,6 +74,101 @@
   </main>
   <script src="config.js"></script>
   <script src="wimp-rewards.js"></script>
+  <style>
+    .token-card {
+      background: linear-gradient(135deg, #f0fbf6 0%, #ffffff 100%);
+      border: 1px solid #dfe8e3;
+      border-radius: 18px;
+      box-shadow: 0 18px 48px rgba(12, 60, 44, 0.08);
+      padding: 22px;
+      margin: 20px 0;
+    }
+    .token-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .token-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      background: #dff4ea;
+      color: #0a6b4d;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .token-balance-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e7efe8;
+    }
+    .token-balance-row strong {
+      font-size: clamp(30px, 4vw, 46px);
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+    .token-balance-row span {
+      color: #5a6d67;
+      font-size: 13px;
+    }
+    .token-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .token-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px;
+      background: #fff;
+      border: 1px solid #ecf1ee;
+      border-radius: 12px;
+    }
+    .token-form label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #63766f;
+    }
+    .token-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .token-input-row input {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #dfe8e3;
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 15px;
+      background: white;
+    }
+    .token-input-row button {
+      border: none;
+      border-radius: 9px;
+      background: #0d8b61;
+      color: white;
+      font-weight: 700;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    @media (max-width: 640px) {
+      .token-actions { grid-template-columns: 1fr; }
+      .token-input-row { flex-direction: column; }
+      .token-input-row button { width: 100%; }
+    }
+  </style>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

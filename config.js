@@ -1,6 +1,6 @@
 window.APP_CONFIG = window.APP_CONFIG || {};
 window.APP_CONFIG.API_BASE = "https://backend-o5q5.onrender.com/api";
-window.wimsNotice = (message, type = "info") => {
+window.wimsNotify = (message, type = "info") => {
 	const notice = document.createElement("div");
 	notice.className = `wims-notice wims-notice-${type}`;
 	notice.textContent = message;
@@ -10,11 +10,30 @@ window.wimsNotice = (message, type = "info") => {
 		notice.classList.remove("is-visible");
 		window.setTimeout(() => notice.remove(), 250);
 	}, 4500);
+	if ("Notification" in window && Notification.permission === "granted" && message) {
+		const title = {
+			info: "WIMPS update",
+			success: "Success",
+			warning: "Heads up",
+			error: "Action needed"
+		}[type] || "WIMPS update";
+		try {
+			new Notification(title, { body: message, tag: `wimps-${Date.now()}` });
+		} catch (error) {
+			// Browser notification is best effort and must not block the page UI.
+		}
+	}
 };
-window.wimsAlert = (message, type = "warning") => window.wimsNotice?.(message, type);
+window.wimsNotice = (message, type = "info") => window.wimsNotify?.(message, type);
+window.wimsAlert = (message, type = "warning") => window.wimsNotify?.(message, type);
 const noticeStyle = document.createElement("style");
-noticeStyle.textContent = ".wims-notice{position:fixed;right:20px;bottom:20px;z-index:9999;max-width:min(380px,calc(100vw - 40px));padding:14px 18px;border-radius:10px;background:#172033;color:#fff;box-shadow:0 12px 30px #0003;font:600 14px/1.4 sans-serif;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s}.wims-notice.is-visible{opacity:1;transform:translateY(0)}.wims-notice-success{background:#16794c}.wims-notice-error{background:#a83232}.wims-notice-warning{background:#9a6410}";
+noticeStyle.textContent = ".wims-notice{position:fixed;right:20px;bottom:20px;z-index:9999;max-width:min(380px,calc(100vw - 40px));padding:14px 18px;border-radius:12px;background:linear-gradient(135deg,#172033,#21314c);color:#fff;box-shadow:0 14px 32px rgba(12,22,35,.28);font:700 14px/1.5 sans-serif;letter-spacing:.01em;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s}.wims-notice.is-visible{opacity:1;transform:translateY(0)}.wims-notice-success{background:linear-gradient(135deg,#0e7a55,#17966b)}.wims-notice-error{background:linear-gradient(135deg,#a73c3c,#ca4e4e)}.wims-notice-warning{background:linear-gradient(135deg,#a5670e,#d28b13)}";
 document.head.appendChild(noticeStyle);
+if ("Notification" in window && Notification.permission === "default") {
+	window.addEventListener("load", () => {
+		Notification.requestPermission().catch(() => {});
+	}, { once: true });
+}
 window.wimpsAuthHeaders = () => {
 	try {
 		const user = JSON.parse(localStorage.getItem("user") || "null");

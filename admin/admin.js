@@ -468,6 +468,17 @@
             form.elements.minimumRedemption.value = (Number(settings.minimumRedemptionUnits || 0) / 100).toFixed(2);
             form.elements.maximumDiscount.value = (Number(settings.maximumDiscountUnits || 0) / 100).toFixed(2);
         }
+        const tokenForm = document.getElementById("wimp-token-form");
+        if (tokenForm) {
+            tokenForm.elements.tokenEnabled.checked = settings.tokenEnabled !== false;
+            tokenForm.elements.tokenPurchaseEnabled.checked = settings.tokenPurchaseEnabled !== false;
+            tokenForm.elements.tokenSpendEnabled.checked = settings.tokenSpendEnabled !== false;
+            tokenForm.elements.tokenMinPurchase.value = (Number(settings.tokenMinPurchaseUnits || 0) / 100).toFixed(2);
+            tokenForm.elements.tokenMaxPurchase.value = (Number(settings.tokenMaxPurchaseUnits || 0) / 100).toFixed(2);
+            tokenForm.elements.tokenMinSpend.value = (Number(settings.tokenMinSpendUnits || 0) / 100).toFixed(2);
+            tokenForm.elements.tokenBuyFeePercent.value = Number(settings.tokenBuyFeePercent || 0).toFixed(2);
+            tokenForm.elements.tokenSellFeePercent.value = Number(settings.tokenSellFeePercent || 0).toFixed(2);
+        }
         const body = document.getElementById("wimp-transactions-body");
         const rows = Array.isArray(transactionsPayload.data) ? transactionsPayload.data : [];
         if (body) body.innerHTML = rows.length ? rows.map((entry) => `<tr><td>${escapeHtml(entry.userId)}</td><td>${escapeHtml(entry.type)}</td><td>${(Number(entry.amountUnits || 0) / 100).toFixed(2)}</td><td>${(Number(entry.balanceAfterUnits || 0) / 100).toFixed(2)}</td><td>${escapeHtml(entry.description)}</td><td>${entry.createdAt ? new Date(entry.createdAt).toLocaleString() : "—"}</td></tr>`).join("") : '<tr><td colspan="6">No WIMP ledger entries yet.</td></tr>';
@@ -482,6 +493,16 @@
             const data = await response.json();
             if (!response.ok) throw new Error(data.msg || "Unable to save WIMP settings");
             showToast("WIMP settings saved.");
+        } catch (error) { showToast(error.message); }
+    });
+    document.getElementById("wimp-token-form")?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        try {
+            const response = await fetch(`${adminApiBase}/admin/wimp/settings`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Token": adminToken }, body: JSON.stringify({ tokenEnabled: form.elements.tokenEnabled.checked, tokenPurchaseEnabled: form.elements.tokenPurchaseEnabled.checked, tokenSpendEnabled: form.elements.tokenSpendEnabled.checked, tokenMinPurchase: form.elements.tokenMinPurchase.value, tokenMaxPurchase: form.elements.tokenMaxPurchase.value, tokenMinSpend: form.elements.tokenMinSpend.value, tokenBuyFeePercent: form.elements.tokenBuyFeePercent.value, tokenSellFeePercent: form.elements.tokenSellFeePercent.value }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.msg || "Unable to save token rules");
+            showToast("Token rules saved.");
         } catch (error) { showToast(error.message); }
     });
     document.getElementById("wimp-adjust-form")?.addEventListener("submit", async (event) => {
