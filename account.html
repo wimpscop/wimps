@@ -155,6 +155,49 @@
                             </div>
                         </div>
 
+                        <div class="account-deposit" id="solana-status-panel" style="display: none;">
+                            <div class="deposit-card">
+                                <div class="deposit-card-header">
+                                    <div>
+                                        <h2>Solana Wallet Status</h2>
+                                        <p id="solana-details">The Solana wallet feature remains disabled until approval is complete.</p>
+                                    </div>
+                                    <span class="badge" id="solana-status-badge">Disabled</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="account-deposit" id="solana-wallet-panel" style="display: none;">
+                            <div class="deposit-card">
+                                <div class="deposit-card-header">
+                                    <div>
+                                        <h2>Solana Wallet</h2>
+                                        <p id="solana-wallet-status">Connect a compatible wallet to view and manage your WIMP token balance.</p>
+                                    </div>
+                                    <span class="badge" id="solana-wallet-connection-badge">Disconnected</span>
+                                </div>
+                                <div class="deposit-form">
+                                    <label for="solana-wallet-address">Wallet address</label>
+                                    <input id="solana-wallet-address" type="text" readonly aria-label="Solana wallet address">
+                                    <div class="deposit-actions">
+                                        <button type="button" id="solana-connect-btn" class="btn btn-outline">Connect Wallet</button>
+                                        <button type="button" id="solana-disconnect-btn" class="btn btn-outline" style="display: none;">Disconnect</button>
+                                        <button type="button" id="solana-refresh-balance-btn" class="btn btn-outline">Refresh Balance</button>
+                                    </div>
+                                    <div class="deposit-form" style="margin-top: 18px;">
+                                        <div style="display: flex; justify-content: space-between; gap: 16px; margin-bottom: 8px;">
+                                            <span>Mint</span>
+                                            <strong id="solana-wallet-mint">UNAPPROVED</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; gap: 16px;">
+                                            <span>WIMP balance</span>
+                                            <strong id="solana-wallet-balance">0.000000 WIMP</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="account-deposit">
                             <div class="deposit-card">
                                 <div class="deposit-card-header">
