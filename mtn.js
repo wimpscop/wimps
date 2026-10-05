@@ -530,7 +530,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (!requireLogin()) return;
     loadBundleOffers();
     updateWallet();
 
