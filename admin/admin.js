@@ -448,7 +448,76 @@
         return String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
     }
 
+    function mountWimpCleanupControls() {
+        const panel = document.querySelector('[data-panel="wimp"]');
+        if (!panel || panel.querySelector(".wimp-cleanup-panel")) return;
+        const cleanupPanel = document.createElement("article");
+        cleanupPanel.className = "panel wimp-cleanup-panel";
+        cleanupPanel.innerHTML = `
+            <div class="wimp-cleanup-heading">
+                <div><p class="eyebrow">WIMP DATA MAINTENANCE</p><h2>Clear WIMP activity history</h2></div>
+                <p>These actions remove earned and spent WIMP ledger entries only. WIMP balances, customer accounts, and normal order/payment history remain unchanged.</p>
+            </div>
+            <div class="wimp-cleanup-grid">
+                <form class="wimp-cleanup-form" id="wimp-user-cleanup-form">
+                    <h3>Clear one user</h3>
+                    <label>Customer email<input name="email" type="email" autocomplete="off" required></label>
+                    <label>Type <strong>DELETE USER WIMP ACTIVITY</strong><input name="confirmation" type="text" autocomplete="off" required></label>
+                    <button class="danger-button" type="submit">Delete this user's WIMP activity</button>
+                </form>
+                <form class="wimp-cleanup-form" id="wimp-all-cleanup-form">
+                    <h3>Clear all users</h3>
+                    <label>Type <strong>DELETE ALL WIMP ACTIVITY</strong><input name="confirmation" type="text" autocomplete="off" required></label>
+                    <button class="danger-button" type="submit">Delete all WIMP activity</button>
+                </form>
+            </div>
+            <p class="wimp-cleanup-status" id="wimp-cleanup-status" role="status" aria-live="polite"></p>`;
+        panel.append(cleanupPanel);
+
+        async function submitCleanup(form, url, confirmation) {
+            const status = cleanupPanel.querySelector("#wimp-cleanup-status");
+            const button = form.querySelector('button[type="submit"]');
+            const values = new FormData(form);
+            if (String(values.get("confirmation") || "").trim() !== confirmation) {
+                status.textContent = `Confirmation must exactly match: ${confirmation}`;
+                return;
+            }
+            button.disabled = true;
+                status.textContent = "Deleting WIMP activity history...";
+            try {
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json", "X-Admin-Token": adminToken },
+                    body: JSON.stringify({ confirmation })
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.msg || "Unable to delete WIMP activity");
+                status.textContent = data.msg || "WIMP activity history deleted.";
+                showToast(data.msg || "WIMP activity history deleted.");
+                form.reset();
+                await loadWimpData();
+            } catch (error) {
+                status.textContent = error.message || "Unable to delete WIMP activity.";
+                showToast(status.textContent);
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        cleanupPanel.querySelector("#wimp-user-cleanup-form")?.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const email = String(new FormData(form).get("email") || "").trim().toLowerCase();
+            submitCleanup(form, `${adminApiBase}/admin/wimp/users/${encodeURIComponent(email)}`, "DELETE USER WIMP ACTIVITY");
+        });
+        cleanupPanel.querySelector("#wimp-all-cleanup-form")?.addEventListener("submit", (event) => {
+            event.preventDefault();
+            submitCleanup(event.currentTarget, `${adminApiBase}/admin/wimp/activity`, "DELETE ALL WIMP ACTIVITY");
+        });
+    }
+
     async function loadWimpData() {
+        mountWimpCleanupControls();
         const [settingsResponse, transactionsResponse] = await Promise.all([
             fetch(`${adminApiBase}/admin/wimp/settings`, { headers: { "X-Admin-Token": adminToken } }),
             fetch(`${adminApiBase}/admin/wimp/transactions?limit=200`, { headers: { "X-Admin-Token": adminToken } })
