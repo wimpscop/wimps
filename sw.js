@@ -1,5 +1,5 @@
 // WIMPS Service Worker - Cache static assets for offline support
-const CACHE_NAME = 'wimps-v4';
+const CACHE_NAME = 'wimps-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

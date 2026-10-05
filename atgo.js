@@ -61,6 +61,7 @@
 
   let latestPlans = [];
   let currentPurchase = null;
+  let checkoutScrollY = 0;
 
   function setBalanceLocally(balance) {
     const safeBalance = Number(balance || 0);
@@ -202,6 +203,20 @@
     }).join("");
   }
 
+  function lockCheckoutScroll() {
+    if (document.body.classList.contains("checkout-open")) return;
+    checkoutScrollY = window.scrollY || document.documentElement.scrollTop;
+    document.body.style.setProperty("--checkout-scroll-position", `-${checkoutScrollY}px`);
+    document.body.classList.add("checkout-open");
+  }
+
+  function unlockCheckoutScroll() {
+    if (!document.body.classList.contains("checkout-open")) return;
+    document.body.classList.remove("checkout-open");
+    document.body.style.removeProperty("--checkout-scroll-position");
+    window.scrollTo(0, checkoutScrollY);
+  }
+
   function openCheckout(planId) {
     if (!requireLogin()) return;
     const user = getUser();
@@ -254,7 +269,11 @@
       if (wimpInput) wimpInput.max = String(Math.min(currentPurchase.wimpBalance, Math.max(0, currentPurchase.grossTotal - currentPurchase.referralDiscount)));
     }).catch(() => {});
 
-    document.getElementById("checkout-modal").style.display = "flex";
+    const checkoutModal = document.getElementById("checkout-modal");
+    if (!checkoutModal) return;
+    if (checkoutModal.parentElement !== document.body) document.body.appendChild(checkoutModal);
+    lockCheckoutScroll();
+    checkoutModal.style.display = "flex";
   }
 
   function updatePurchaseTotal() {
@@ -281,6 +300,7 @@
   function closeCheckoutModal() {
     const modal = document.getElementById("checkout-modal");
     if (modal) modal.style.display = "none";
+    unlockCheckoutScroll();
   }
 
   async function buyWithWallet() {
@@ -490,6 +510,13 @@
     document.getElementById("deposit-paystack")?.addEventListener("click", depositWithPaystack);
     document.getElementById("modal-close-btn")?.addEventListener("click", closeCheckoutModal);
     document.querySelector(".close-btn")?.addEventListener("click", closeCheckoutModal);
+    const checkoutModal = document.getElementById("checkout-modal");
+    checkoutModal?.addEventListener("click", (event) => {
+      if (event.target === checkoutModal) closeCheckoutModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && checkoutModal?.style.display === "flex") closeCheckoutModal();
+    });
   });
 
   window.openCheckout = openCheckout;
