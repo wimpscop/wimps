@@ -42,6 +42,13 @@ function supportDeveloper(amount, type) {
     currentSupportAmount = amount;
     currentSupportType = type;
 
+    const emailField = document.getElementById("support-email");
+    try {
+        emailField.value = JSON.parse(localStorage.getItem("user") || "null")?.email || "";
+    } catch (error) {
+        emailField.value = "";
+    }
+
     document.getElementById("support-modal").style.display = "flex";
     document.getElementById(
         "support-message"
@@ -54,37 +61,28 @@ function closeSupportModal() {
 
 // ===== SEND TO BACKEND =====
 async function sendDonation(reference, amount, email) {
-    try {
-        const res = await fetch(`${API_BASE}/support/donate`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                reference,
-                amount,
-                email
-            })
-        });
+    const res = await fetch(`${API_BASE}/support/donate`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reference, amount, email })
+    });
 
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.msg);
-
-        console.log("Saved to backend:", data);
-    } catch (err) {
-        console.error("Donation error:", err);
-    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.msg || "Unable to record your donation");
+    return data;
 }
 
 // ===== PAYSTACK =====
 function payWithCard() {
     const user = JSON.parse(localStorage.getItem("user"));
-    let email = user?.email;
-
-    if (!email) {
-        email = prompt("Enter your email:");
-        if (!email) return;
+    const emailField = document.getElementById("support-email");
+    const email = String(user?.email || emailField?.value || "").trim();
+    if (!email || (emailField && !emailField.checkValidity())) {
+        window.wimsNotice?.("Enter a valid email for your donation receipt.", "warning");
+        emailField?.focus();
+        return;
     }
 
     if (!window.PaystackPop) {
@@ -110,11 +108,14 @@ function payWithCard() {
         currency: "GHS",
         reference: ref,
 
-        callback: function (response) {
-            sendDonation(response.reference, currentSupportAmount, email);
-
-            window.wimsNotice?.("Donation successful.", "success");
-            closeSupportModal();
+        callback: async function (response) {
+            try {
+                await sendDonation(response.reference, currentSupportAmount, email);
+                window.wimsNotice?.("Donation recorded successfully. Thank you for supporting WIMPS.", "success");
+                closeSupportModal();
+            } catch (error) {
+                window.wimsNotice?.(`Paystack returned, but the donation could not be recorded. Do not pay again. Contact support with reference ${response.reference || "unavailable"}.`, "error", { duration: 9000 });
+            }
         },
 
         onClose: function () {

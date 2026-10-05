@@ -11,7 +11,10 @@ const API_BASE = (() => {
         : "/api";
 })();
 
+let accountLoadErrorNotified = false;
+
 document.addEventListener("DOMContentLoaded", async () => {
+    if (!document.getElementById("logged-in")) return;
     if (window.wimpsCheckSession && !(await window.wimpsCheckSession())) return;
     initializeAccount();
     setupAccountDepositButton();
@@ -28,7 +31,8 @@ function initializeAccount() {
     const notLoggedInView = document.getElementById("not-logged-in");
 
     if (!user || !user.email) {
-        window.location.href = "./login-page.html?v=3#signup";
+        if (loggedInView) loggedInView.style.display = "none";
+        if (notLoggedInView) notLoggedInView.style.display = "block";
         return;
     }
 
@@ -51,8 +55,18 @@ function setupReferral(user) {
     if (linkInput) linkInput.value = link;
     if (count) count.textContent = `${Number(user.referralCount || 0)} referrals`;
     document.getElementById('copy-referral-link')?.addEventListener('click', async () => {
-        await navigator.clipboard?.writeText(link);
-        window.wimsNotice?.('Referral link copied.', 'success');
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(link);
+            } else {
+                linkInput?.select();
+                if (!document.execCommand('copy')) throw new Error('Clipboard unavailable');
+            }
+            window.wimsNotice?.('Referral link copied.', 'success');
+        } catch (error) {
+            linkInput?.select();
+            window.wimsNotice?.('Select the referral link and copy it to share.', 'warning');
+        }
     });
 }
 
@@ -73,14 +87,29 @@ function setupProfileUpload(user) {
 
     uploadInput.addEventListener("change", () => {
         const [file] = uploadInput.files || [];
-        if (!file || !file.type.startsWith("image/")) return;
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            window.wimsNotice?.("Choose an image file for your profile photo.", "warning");
+            return;
+        }
+        if (file.size > 3 * 1024 * 1024) {
+            window.wimsNotice?.("Choose an image smaller than 3 MB.", "warning");
+            uploadInput.value = "";
+            return;
+        }
 
         const reader = new FileReader();
         reader.addEventListener("load", () => {
             const imageData = String(reader.result);
-            localStorage.setItem(`profilePicture:${user.email}`, imageData);
-            renderProfilePicture(imageData, picture);
+            try {
+                localStorage.setItem(`profilePicture:${user.email}`, imageData);
+                renderProfilePicture(imageData, picture);
+                window.wimsNotice?.("Profile photo updated.", "success");
+            } catch (error) {
+                window.wimsNotice?.("This image could not be saved. Try a smaller photo.", "error");
+            }
         });
+        reader.addEventListener("error", () => window.wimsNotice?.("The image could not be read. Try another file.", "error"));
         reader.readAsDataURL(file);
     });
 }
@@ -127,7 +156,7 @@ async function loadAccountData(email) {
         });
 
         if (walletRes.status === 401) {
-            window.wimpsLogout?.("Your account was deleted. Create a new account to continue.");
+            window.wimpsLogout?.("Your session ended. Please sign in again.");
             return;
         }
         if (!walletRes.ok) throw new Error("Wallet request failed");
@@ -142,6 +171,10 @@ async function loadAccountData(email) {
 
         // sync localStorage
         const user = getUser();
+        if (!user) {
+            window.wimpsLogout?.("Your session ended. Please sign in again.");
+            return;
+        }
         user.balance = balance;
         localStorage.setItem("user", JSON.stringify(user));
 
@@ -173,12 +206,17 @@ async function loadAccountData(email) {
             totalTransactions: transactions.length,
             balance
         }));
+        accountLoadErrorNotified = false;
 
         // (optional debug)
         console.log("Transactions:", transactions);
 
     } catch (err) {
         console.error("Account load error:", err);
+        if (!accountLoadErrorNotified) {
+            accountLoadErrorNotified = true;
+            window.wimsNotice?.("We couldn't refresh your account right now. Check your connection and try again.", "error");
+        }
     }
 }
 
@@ -194,11 +232,18 @@ function setupAccountDepositButton() {
     depositBtn.addEventListener("click", async () => {
         const amount = Number(amountInput.value);
         if (!Number.isFinite(amount) || amount < 10) {
-            window.wimsAlert("Enter a valid deposit amount of at least GHS 10.");
+            window.wimsNotice?.("Enter a deposit amount of at least GHS 10.", "warning");
             return;
         }
 
-        await openPaystackDeposit(amount);
+        depositBtn.disabled = true;
+        try {
+            await openPaystackDeposit(amount);
+        } catch (error) {
+            window.wimsNotice?.("Paystack could not be opened. Please try again.", "error");
+        } finally {
+            depositBtn.disabled = false;
+        }
     });
 }
 
@@ -210,7 +255,11 @@ function setupLogout() {
     logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("user");
         localStorage.removeItem("solanaWalletAddress");
-        window.location.href = "login-page.html";
+        if (window.wimsRedirectWithNotice) {
+            window.wimsRedirectWithNotice("./login-page.html", "You have been signed out.", "success");
+        } else {
+            window.location.href = "login-page.html";
+        }
     });
 }
 

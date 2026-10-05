@@ -43,11 +43,20 @@
     async function openPaystackDeposit(amountOverride) {
         const user = getUser();
         if (!user || !user.email) {
-            window.wimsAlert("Please log in first.");
+            if (window.wimsRedirectWithNotice) {
+                window.wimsRedirectWithNotice("./login-page.html?v=3#signup", "Sign in to add funds to your wallet.", "info");
+            } else {
+                window.wimsAlert("Please log in first.");
+            }
             return;
         }
 
-        const depositAmount = Number(amountOverride || prompt('Enter deposit amount in GHS', '10'));
+        if (amountOverride === undefined || amountOverride === null) {
+            window.location.href = "./account.html#wallet-funding";
+            return;
+        }
+
+        const depositAmount = Number(amountOverride);
         if (!Number.isFinite(depositAmount) || depositAmount < 10) {
             window.wimsAlert("Enter a valid deposit amount of at least GHS 10.");
             return;
@@ -75,7 +84,15 @@
 
                         const data = await res.json();
                         if (!res.ok) {
-                            window.wimsNotice?.(data.msg || data.message || 'Your deposit could not be verified. Please check Paystack and try again.', 'error');
+                            const reference = response.reference || "unavailable";
+                            const message = `Paystack returned from checkout, but the deposit is not confirmed. Do not pay again. Check transaction history; if the deposit is missing, contact support with reference ${reference}. ${data.msg || data.message || ""}`;
+                            if (res.status === 401 && window.wimsRedirectWithNotice) {
+                                localStorage.removeItem("user");
+                                localStorage.removeItem("accountStats");
+                                window.wimsRedirectWithNotice("./login-page.html?v=3#signup", message, "error");
+                            } else {
+                                window.wimsNotice?.(message, "error", { duration: 9000 });
+                            }
                             return;
                         }
 
@@ -85,10 +102,11 @@
                         }
 
                         updateBalanceInDom();
+                        window.loadAccountData?.(user.email);
                         window.wimsNotice?.(data.msg || 'Deposit successful', 'success');
                     } catch (err) {
                         console.error(err);
-                        window.wimsNotice?.('We could not confirm your deposit. Please check your transaction status before retrying.', 'error');
+                        window.wimsNotice?.(`Paystack returned, but WIMPS could not confirm the deposit. Do not pay again. Check transaction history or contact support with reference ${response.reference || "unavailable"}.`, 'error', { duration: 9000 });
                     }
                 })();
             },
@@ -130,10 +148,10 @@
             homeButton.addEventListener('click', () => {
                 const user = getUser();
                 if (!user?.email) {
-                    window.location.href = './login-page.html?v=3#signup';
+                    window.wimsRedirectWithNotice?.("./login-page.html?v=3#signup", "Sign in to add funds to your wallet.", "info");
                     return;
                 }
-                openPaystackDeposit();
+                window.location.href = './account.html#wallet-funding';
             });
         }
     }

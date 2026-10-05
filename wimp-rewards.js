@@ -19,7 +19,12 @@
         fetch(`${apiBase}/wimp/token/balance`, { headers: authHeaders() })
       ]);
       if (walletResponse.status === 401 || ledgerResponse.status === 401 || tokenResponse.status === 401) {
-        window.location.href = "./login-page.html?v=3#signup";
+        const message = "Sign in to view and manage WIMP rewards.";
+        if (window.wimsRedirectWithNotice) {
+          window.wimsRedirectWithNotice("./login-page.html?v=3#signup", message, "info");
+        } else {
+          window.location.href = "./login-page.html?v=3#signup";
+        }
         return;
       }
       const wallet = await walletResponse.json();

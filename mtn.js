@@ -75,7 +75,11 @@
 
   function requireLogin() {
     if (getUser()?.email) return true;
-    window.location.href = "./login-page.html?v=3#signup";
+    if (window.wimsRedirectWithNotice) {
+      window.wimsRedirectWithNotice("./login-page.html?v=3#signup", "Sign in before placing an order.", "info");
+    } else {
+      window.location.href = "./login-page.html?v=3#signup";
+    }
     return false;
   }
 
@@ -102,30 +106,7 @@
   }
 
   function showPurchaseFeedback(message) {
-    const feedback = document.getElementById('wimps-feedback') || (() => {
-      const el = document.createElement('div');
-      el.id = 'wimps-feedback';
-      el.style.position = 'fixed';
-      el.style.bottom = '24px';
-      el.style.right = '24px';
-      el.style.padding = '12px 16px';
-      el.style.background = '#163c28';
-      el.style.color = '#fff';
-      el.style.borderRadius = '8px';
-      el.style.boxShadow = '0 12px 32px rgba(0,0,0,0.22)';
-      el.style.zIndex = '5000';
-      el.style.maxWidth = '420px';
-      el.style.fontFamily = 'Arial, sans-serif';
-      document.body.appendChild(el);
-      return el;
-    })();
-
-    feedback.textContent = message || 'Purchase processed.';
-    feedback.style.display = 'block';
-    clearTimeout(feedback.hideTimer);
-    feedback.hideTimer = setTimeout(() => {
-      feedback.style.display = 'none';
-    }, 3500);
+    window.wimsNotice?.(message || 'Purchase processed.', 'error');
   }
 
   async function updateWallet() {
@@ -369,11 +350,9 @@
         setBalanceLocally(data.balance);
       }
 
-      showPurchaseFeedback(data.msg || data.message || "Purchase successful");
-      closeCheckoutModal();
-      updateWallet();
-      loadBundleOffers();
-      window.setTimeout(() => window.location.reload(), 250);
+      const message = data.msg || data.message || "Purchase complete. Your order is now in transaction history.";
+      if (window.wimsCompletePurchase) window.wimsCompletePurchase(message);
+      else window.location.href = "./history.html";
     } catch (err) {
       console.error(err);
       window.wimsAlert("Network error while processing the purchase.");
@@ -424,7 +403,15 @@
             const data = await res.json();
 
             if (!res.ok) {
-              showPurchaseFeedback(data.msg || data.message || "Payment verification failed");
+              const reference = response.reference || "unavailable";
+              const message = `Paystack returned from checkout, but the order is not confirmed. Do not pay again. Check transaction history; if it is not listed, contact support with reference ${reference}. ${data.msg || data.message || ""}`;
+              if (res.status === 401 && window.wimsRedirectWithNotice) {
+                localStorage.removeItem("user");
+                localStorage.removeItem("accountStats");
+                window.wimsRedirectWithNotice("./login-page.html?v=3#signup", message, "error");
+              } else {
+                window.wimsNotice?.(message, "error", { duration: 9000 });
+              }
               return;
             }
 
@@ -432,14 +419,12 @@
               setBalanceLocally(data.balance);
             }
 
-            showPurchaseFeedback(data.msg || data.message || "Payment successful");
-            closeCheckoutModal();
-            updateWallet();
-            loadBundleOffers();
-            window.setTimeout(() => window.location.reload(), 250);
+            const message = data.msg || data.message || "Purchase complete. Your order is now in transaction history.";
+            if (window.wimsCompletePurchase) window.wimsCompletePurchase(message);
+            else window.location.href = "./history.html";
           } catch (err) {
             console.error(err);
-            window.wimsNotice?.("Payment completed, but the server could not verify it. Please check your transaction history before trying again.", "error");
+            window.wimsNotice?.(`Payment was submitted, but WIMPS could not confirm the order. Do not pay again. Check transaction history or contact support with reference ${response.reference || "unavailable"}.`, "error", { duration: 9000 });
           }
         })();
       },
@@ -490,7 +475,15 @@
             const data = await res.json();
 
             if (!res.ok) {
-              window.wimsNotice?.(data.msg || data.message || "Your deposit could not be verified. Please check Paystack and try again.", "error");
+              const reference = response.reference || "unavailable";
+              const message = `Paystack returned from checkout, but the deposit is not confirmed. Do not pay again. Check transaction history; if the deposit is missing, contact support with reference ${reference}. ${data.msg || data.message || ""}`;
+              if (res.status === 401 && window.wimsRedirectWithNotice) {
+                localStorage.removeItem("user");
+                localStorage.removeItem("accountStats");
+                window.wimsRedirectWithNotice("./login-page.html?v=3#signup", message, "error");
+              } else {
+                window.wimsNotice?.(message, "error", { duration: 9000 });
+              }
               return;
             }
 
@@ -503,7 +496,7 @@
             updateWallet();
           } catch (err) {
             console.error(err);
-            window.wimsNotice?.("We could not confirm your deposit. Please check your transaction status before retrying.", "error");
+            window.wimsNotice?.(`Paystack returned, but WIMPS could not confirm the deposit. Do not pay again. Check transaction history or contact support with reference ${response.reference || "unavailable"}.`, "error", { duration: 9000 });
           }
         })();
       },
