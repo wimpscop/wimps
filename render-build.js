@@ -28,6 +28,44 @@ window.wimpsAuthHeaders = () => {
 		return {};
 	}
 };
+window.wimpsLogout = (message) => {
+	localStorage.removeItem("user");
+	localStorage.removeItem("accountStats");
+	if (message) window.wimsNotice?.(message, "warning");
+	window.setTimeout(() => { window.location.href = "./login-page.html?v=3#signup"; }, 250);
+};
+window.wimpsSessionCheck = window.wimpsSessionCheck || null;
+window.wimpsCheckSession = () => {
+	if (window.wimpsSessionCheck) return window.wimpsSessionCheck;
+	const check = (async () => {
+	try {
+		const rawUser = localStorage.getItem("user");
+		const user = rawUser ? JSON.parse(rawUser) : null;
+		if (!user?.authToken) {
+			if (user?.email) {
+				window.wimpsLogout("Your session has expired. Please log in again.");
+				return false;
+			}
+			return true;
+		}
+		const configured = window.APP_CONFIG?.API_BASE;
+		const apiBase = configured ? String(configured).replace(new RegExp("/$"), "") : (/localhost|127\\.0\\.0\\.1/.test(window.location.hostname) ? "http://localhost:5000/api" : "/api");
+		const response = await fetch(\`${apiBase}/auth/session\`, { headers: window.wimpsAuthHeaders() });
+		if (response.status === 401) {
+			const data = await response.json().catch(() => ({}));
+			window.wimpsLogout(data.msg || "Your account was deleted. Create a new account to continue.");
+			return false;
+		}
+		return true;
+	} catch (error) {
+		return true;
+	}
+})();
+	window.wimpsSessionCheck = check.finally(() => { window.wimpsSessionCheck = null; });
+	return window.wimpsSessionCheck;
+};
+document.addEventListener("DOMContentLoaded", () => window.wimpsCheckSession());
+window.setInterval(() => window.wimpsCheckSession(), 60000);
 `;
 
 fs.writeFileSync("config.js", contents);

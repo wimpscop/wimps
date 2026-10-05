@@ -59,7 +59,13 @@ window.wimpsCheckSession = () => {
 	try {
 		const rawUser = localStorage.getItem("user");
 		const user = rawUser ? JSON.parse(rawUser) : null;
-		if (!user?.authToken) return true;
+		if (!user?.authToken) {
+			if (user?.email) {
+				window.wimpsLogout("Your session has expired. Please log in again.");
+				return false;
+			}
+			return true;
+		}
 		const configured = window.APP_CONFIG?.API_BASE;
 		const apiBase = configured ? String(configured).replace(/\/$/, "") : (/localhost|127\.0\.0\.1/.test(window.location.hostname) ? "http://localhost:5000/api" : "/api");
 		const response = await fetch(`${apiBase}/auth/session`, { headers: window.wimpsAuthHeaders() });
