@@ -103,7 +103,11 @@
 
                         updateBalanceInDom();
                         window.loadAccountData?.(user.email);
-                        window.wimsNotice?.(data.msg || 'Deposit successful', 'success');
+                        const creditedAmount = Number(data.creditedAmount);
+                        const message = Number.isFinite(creditedAmount)
+                            ? `${data.msg || 'Deposit successful'}: GHS ${creditedAmount.toFixed(2)} credited to your wallet.`
+                            : data.msg || 'Deposit successful';
+                        window.wimsNotice?.(message, 'success');
                     } catch (err) {
                         console.error(err);
                         window.wimsNotice?.(`Paystack returned, but WIMPS could not confirm the deposit. Do not pay again. Check transaction history or contact support with reference ${response.reference || "unavailable"}.`, 'error', { duration: 9000 });

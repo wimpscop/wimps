@@ -440,7 +440,9 @@
             }
 
             const message = data.msg || data.message || "Purchase complete. Your order is now in transaction history.";
-            if (window.wimsCompletePurchase) window.wimsCompletePurchase(message);
+            if (data.data?.status === "pending" && window.wimsRedirectWithNotice) {
+              window.wimsRedirectWithNotice("./history.html", message, "warning", 9000);
+            } else if (window.wimsCompletePurchase) window.wimsCompletePurchase(message);
             else window.location.href = "./history.html";
           } catch (err) {
             console.error(err);
@@ -512,7 +514,11 @@
               setUser(user);
             }
 
-            window.wimsNotice?.(data.msg || "Deposit successful", "success");
+            const creditedAmount = Number(data.creditedAmount);
+            const message = Number.isFinite(creditedAmount)
+              ? `${data.msg || "Deposit successful"}: GHS ${creditedAmount.toFixed(2)} credited to your wallet.`
+              : data.msg || "Deposit successful";
+            window.wimsNotice?.(message, "success");
             updateWallet();
           } catch (err) {
             console.error(err);
